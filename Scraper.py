@@ -4,6 +4,8 @@ import time
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 
+initial_start = True
+
 
 def delay():
     time.sleep(random.randint(2, 3))
@@ -11,12 +13,15 @@ def delay():
 
 if __name__ == '__main__':
     driver = uc.Chrome()
+    driver.get('https://www.ebay-kleinanzeigen.de/m-einloggen.html')
+    print('Press enter, when logged in ')
+    input()
 
     # search = input()
     search = 'iphone-13'
     # kriterien = input()
     filter_in_list = 'neu, keine kratzer, keine risse'.split(', ')
-    filter_out_list = 'suche, kleine risse, kleine kratzer'.split(', ')
+    filter_out_list = 'suche, kleine risse, kleine kratzer, case, hülle, tausch'.split(', ')
 
     all_items = []
     all_ids = []
@@ -24,7 +29,6 @@ if __name__ == '__main__':
 
     for page in range(1, 50):
         driver.get('https://www.ebay-kleinanzeigen.de/s-seite:' + str(page) + '/' + str(search) + '/k0')
-        delay()
 
         table = driver.find_element(By.XPATH, '//*[@id="srchrslt-adtable"]')
         items = table.find_elements(By.TAG_NAME, 'li')
@@ -41,7 +45,11 @@ if __name__ == '__main__':
         for url in page_urls:
             message = True
             driver.get(url)
-            delay()
+
+            if initial_start:
+                driver.find_element(By.XPATH, '//*[@id="vap-ovrly-secure"]/a').click()
+                initial_start = False
+
             description = driver.find_element(By.ID, 'viewad-description-text').text
             for filter_in in filter_in_list:
                 if filter_in.lower() in description.lower():
@@ -51,6 +59,10 @@ if __name__ == '__main__':
                     message = False
 
             if message:
+                driver.find_element(By.XPATH, '//*[@id="viewad-contact-form"]/fieldset/div[1]/div/textarea').send_keys("test")
+                # driver.find_element(By.XPATH, '//*[@id="viewad-contact-form"]/fieldset/div[4]/button').click()
                 print(url)
+                delay()
+                delay()
 
         page_urls = []
