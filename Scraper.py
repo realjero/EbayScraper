@@ -23,9 +23,13 @@ if __name__ == '__main__':
     filter_in_list = 'neu, keine kratzer, keine risse'.split(', ')
     filter_out_list = 'suche, kleine risse, kleine kratzer, case, hülle, tausch'.split(', ')
 
+    file = open('ids.log', 'r')
     all_items = []
-    all_ids = []
+    all_ids = file.read().splitlines()
+    file.close()
     page_urls = []
+
+    file = open('ids.log', 'a')
 
     for page in range(1, 50):
         driver.get('https://www.ebay-kleinanzeigen.de/s-seite:' + str(page) + '/' + str(search) + '/k0')
@@ -39,6 +43,7 @@ if __name__ == '__main__':
 
                 if anzeigen_id not in all_ids:
                     all_ids.append(anzeigen_id)
+                    file.write(anzeigen_id + '\n')
 
                     page_urls.append(item.find_element(By.TAG_NAME, 'a').get_attribute('href'))
 
@@ -61,8 +66,6 @@ if __name__ == '__main__':
             if message:
                 driver.find_element(By.XPATH, '//*[@id="viewad-contact-form"]/fieldset/div[1]/div/textarea').send_keys("test")
                 # driver.find_element(By.XPATH, '//*[@id="viewad-contact-form"]/fieldset/div[4]/button').click()
-                print(url)
-                delay()
                 delay()
 
         page_urls = []
