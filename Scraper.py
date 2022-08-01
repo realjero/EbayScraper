@@ -15,6 +15,8 @@ if __name__ == '__main__':
     # search = input()
     search = 'iphone-13'
     # kriterien = input()
+    filter_in_list = 'neu, keine kratzer, keine risse'.split(', ')
+    filter_out_list = 'suche, kleine risse, kleine kratzer'.split(', ')
 
     all_items = []
     all_ids = []
@@ -37,8 +39,18 @@ if __name__ == '__main__':
                     page_urls.append(item.find_element(By.TAG_NAME, 'a').get_attribute('href'))
 
         for url in page_urls:
+            message = True
             driver.get(url)
             delay()
-            print(driver.find_element(By.ID, 'viewad-description-text').text)
+            description = driver.find_element(By.ID, 'viewad-description-text').text
+            for filter_in in filter_in_list:
+                if filter_in.lower() in description.lower():
+                    message = True
+            for filter_out in filter_out_list:
+                if filter_out.lower() in description.lower():
+                    message = False
+
+            if message:
+                print(url)
 
         page_urls = []
