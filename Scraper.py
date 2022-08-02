@@ -17,16 +17,21 @@ if __name__ == '__main__':
     print('Press enter, when logged in ')
     input()
 
-    # search = input()
-    search = 'iphone-13'
-    # kriterien = input()
-    filter_in_list = 'neu, keine kratzer, keine risse'.split(', ')
-    filter_out_list = 'suche, kleine risse, kleine kratzer, case, hülle, tausch'.split(', ')
+    print('for automated search, enter item and press enter.')
+    search = input().replace(' ', '-')
+
+    # example ('neu, keine kratzer, keine risse')
+    print('add words to whitelist (", " for separated words)')
+    whitelist = input().split(', ')
+
+    # example ('suche, kleine risse, kleine kratzer, case, hülle, tausch')
+    print('add words to blacklist (", " for separated words)')
+    blacklist = input().split(', ')
 
     file = open('ids.log', 'r')
-    all_items = []
     all_ids = file.read().splitlines()
     file.close()
+
     page_urls = []
 
     file = open('ids.log', 'a')
@@ -34,32 +39,35 @@ if __name__ == '__main__':
     for page in range(1, 50):
         driver.get('https://www.ebay-kleinanzeigen.de/s-seite:' + str(page) + '/' + str(search) + '/k0')
 
-        table = driver.find_element(By.XPATH, '//*[@id="srchrslt-adtable"]')
-        items = table.find_elements(By.TAG_NAME, 'li')
+        items = driver.find_element(By.XPATH, '//*[@id="srchrslt-adtable"]').find_elements(By.TAG_NAME, 'li')
+
         for item in items:
             if item.get_attribute('class') == 'ad-listitem lazyload-item   ':
 
-                anzeigen_id = item.find_element(By.TAG_NAME, 'article').get_attribute('data-adid')
+                bay_id = item.find_element(By.TAG_NAME, 'article').get_attribute('data-adid')
 
-                if anzeigen_id not in all_ids:
-                    all_ids.append(anzeigen_id)
-                    file.write(anzeigen_id + '\n')
+                if bay_id not in all_ids:
+                    all_ids.append(bay_id)
+                    file.write(bay_id + '\n')
 
                     page_urls.append(item.find_element(By.TAG_NAME, 'a').get_attribute('href'))
 
         for url in page_urls:
             message = True
             driver.get(url)
+            delay()
 
             if initial_start:
                 driver.find_element(By.XPATH, '//*[@id="vap-ovrly-secure"]/a').click()
                 initial_start = False
 
             description = driver.find_element(By.ID, 'viewad-description-text').text
-            for filter_in in filter_in_list:
+
+            for filter_in in whitelist:
                 if filter_in.lower() in description.lower():
                     message = True
-            for filter_out in filter_out_list:
+
+            for filter_out in blacklist:
                 if filter_out.lower() in description.lower():
                     message = False
 
