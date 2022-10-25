@@ -6,9 +6,11 @@ from selenium.webdriver.common.by import By
 
 initial_start = True
 
+input_text = "test"
+
 
 def delay():
-    time.sleep(random.randint(2, 3))
+    time.sleep(random.randint(3, 4))
 
 
 if __name__ == '__main__':
@@ -20,11 +22,17 @@ if __name__ == '__main__':
     print('for automated search, enter item and press enter.')
     search = input().replace(' ', '-')
 
-    # example ('neu, keine kratzer, keine risse')
+    print('enter from price')
+    from1 = input()
+
+    print('enter to price')
+    to = input()
+
+    print("example ('neu, keine kratzer, keine risse')")
     print('add words to whitelist (", " for separated words)')
     whitelist = input().split(', ')
 
-    # example ('suche, kleine risse, kleine kratzer, case, hülle, tausch')
+    print("example ('suche, kleine risse, kleine kratzer, case, hülle, tausch')")
     print('add words to blacklist (", " for separated words)')
     blacklist = input().split(', ')
 
@@ -37,7 +45,7 @@ if __name__ == '__main__':
     file = open('ids.log', 'a')
 
     for page in range(1, 50):
-        driver.get('https://www.ebay-kleinanzeigen.de/s-seite:' + str(page) + '/' + str(search) + '/k0')
+        driver.get('https://www.ebay-kleinanzeigen.de/s-preis:' + str(from1) + ':' + str(to) + '/s-seite:' + str(page) + '/' + str(search) + '/k0')
 
         items = driver.find_element(By.XPATH, '//*[@id="srchrslt-adtable"]').find_elements(By.TAG_NAME, 'li')
 
@@ -72,8 +80,8 @@ if __name__ == '__main__':
                     message = False
 
             if message:
-                driver.find_element(By.XPATH, '//*[@id="viewad-contact-form"]/fieldset/div[1]/div/textarea').send_keys("test")
-                # driver.find_element(By.XPATH, '//*[@id="viewad-contact-form"]/fieldset/div[4]/button').click()
+                driver.find_element(By.XPATH, '//*[@id="viewad-contact-form"]/fieldset/div[1]/div/textarea').send_keys(input_text)
+                driver.find_element(By.XPATH, '//*[@id="viewad-contact-form"]/fieldset/div[4]/button').click()
                 delay()
 
         page_urls = []
